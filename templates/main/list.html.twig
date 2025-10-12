@@ -24,6 +24,15 @@
 						<div class="col-10">
 							<input type="text" class="form-control" id="search" name="search" value="{{ search }}">
 						</div>
+						<label for="status" class="col-2 col-form-label">Statut</label>
+						<div class="col-10">
+							<select class="form-control" id="status" name="status" onchange="this.form.submit()">
+								<option value="all" {% if currentStatus == 'all' %} selected {% endif %}>Tous</option>
+								<option value="new" {% if currentStatus == 'new' %} selected {% endif %}>Nouveau</option>
+								<option value="treated" {% if currentStatus == 'treated' %} selected {% endif %}>Traité</option>
+								<option value="archived" {% if currentStatus == 'archived' %} selected {% endif %}>Archivé</option>
+							</select>
+						</div>
 					</div>
 
 					<div>
@@ -34,15 +43,6 @@
 							Rechercher
 						</button>
 					</div>
-                     <label for="status" class="col-2 col-form-label">Statut</label>
-                        <div class="col-10">
-                            <select class="form-control" id="status" name="status" onchange="this.form.submit()">
-                                <option value="all" {% if currentStatus == 'all' %}selected{% endif %}>Tous</option>
-                                <option value="new" {% if currentStatus == 'new' %}selected{% endif %}>Nouveau</option>
-                                <option value="treated" {% if currentStatus == 'treated' %}selected{% endif %}>Traité</option>
-                                <option value="archived" {% if currentStatus == 'archived' %}selected{% endif %}>Archivé</option>
-                            </select>
-                        </div>
 				</form>
 
 				<table class="table">
@@ -70,7 +70,7 @@
 
 				<div class="paginate">
 					{% if currentPage > 1 %}
-						<a href="{{ path('main_list', {page: currentPage-1, search:search}) }}" class="btn btn-light float-start">
+						<a href="{{ path('main_list', {page: currentPage-1, search:search, status:currentStatus}) }}" class="btn btn-light float-start">
 							Précédent
 						</a>
 					{% endif %}
@@ -81,7 +81,7 @@
 						{{ totalPages }}</button>
 
 					{% if currentPage < totalPages %}
-						<a href="{{ path('main_list', {page: currentPage+1, search:search}) }}" class="btn btn-light float-end">
+						<a href="{{ path('main_list', {page: currentPage+1, search:search, status:currentStatus}) }}" class="btn btn-light float-end">
 							Suivant
 						</a>
 					{% endif %}

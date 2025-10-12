@@ -32,6 +32,20 @@ class ContactRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function status(int $page, int $limit, string $status): array
+    {
+        $offset = ($page - 1) * $limit;
+
+        return $this->createQueryBuilder('c')
+            ->where('c.status = :status ')
+            ->orderBy('c.createdAt', 'DESC')
+            ->setFirstResult($offset)
+            ->setParameter('status', $status)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
     //    public function findOneBySomeField($value): ?Contact
     //    {
     //        return $this->createQueryBuilder('c')
@@ -72,6 +86,21 @@ class ContactRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('c')
             ->where('c.firstName LIKE :search OR c.name LIKE :search')
             ->setParameter('search', '%' . $search . '%')
+            ->orderBy('c.createdAt', 'DESC')
+            ->setFirstResult($offset)
+            ->setMaxResults($limit);
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function searchStatus(string $search, int $page, int $limit, string $status): array
+    {
+        $offset = ($page - 1) * $limit;
+
+        $qb = $this->createQueryBuilder('c')
+            ->where('c.firstName LIKE :search OR c.name LIKE :search AND c.status = :status ')
+            ->setParameter('search', '%' . $search . '%')
+            ->setParameter('status', $status)
             ->orderBy('c.createdAt', 'DESC')
             ->setFirstResult($offset)
             ->setMaxResults($limit);
