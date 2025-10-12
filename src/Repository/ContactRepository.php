@@ -5,7 +5,7 @@ namespace App\Repository;
 use App\Entity\Contact;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use function Doctrine\ORM\QueryBuilder;
+
 
 /**
  * @extends ServiceEntityRepository<Contact>
@@ -17,20 +17,20 @@ class ContactRepository extends ServiceEntityRepository
         parent::__construct($registry, Contact::class);
     }
 
-    //    /**
-    //     * @return Contact[] Returns an array of Contact objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('c.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * @return Contact[] Returns an array of Contact objects
+     */
+    public function paginate(int $page, int $limit): array
+    {
+        $offset = ($page - 1) * $limit;
+
+        return $this->createQueryBuilder('c')
+            ->orderBy('c.createdAt', 'DESC')
+            ->setFirstResult($offset)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
 
     //    public function findOneBySomeField($value): ?Contact
     //    {
@@ -48,16 +48,34 @@ class ContactRepository extends ServiceEntityRepository
     public function search(string $search): array
     {
         $qb = $this->createQueryBuilder('c');
+
         return $qb
             ->andWhere(
                 $qb->expr()->orX(
                     $qb->expr()->like('c.firstName', ':search'),
-                    $qb->expr()->like('c.name', ':search'),
-                ),
+                    $qb->expr()->like('c.name', ':search')
+                )
             )
-            ->setParameter('search', '%'.$search.'%')
+            ->setParameter('search', '%' . $search . '%')
+            ->orderBy('c.createdAt', 'DESC')
             ->getQuery()
-            ->getResult()
-            ;
+            ->getResult();
+    }
+    /**
+     * @return Contact[] Returns an array of Contact objects
+     */
+
+    public function searchPaginated(string $search, int $page, int $limit): array
+    {
+        $offset = ($page - 1) * $limit;
+
+        $qb = $this->createQueryBuilder('c')
+            ->where('c.firstName LIKE :search OR c.name LIKE :search')
+            ->setParameter('search', '%' . $search . '%')
+            ->orderBy('c.createdAt', 'DESC')
+            ->setFirstResult($offset)
+            ->setMaxResults($limit);
+
+        return $qb->getQuery()->getResult();
     }
 }
